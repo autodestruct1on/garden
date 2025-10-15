@@ -1,0 +1,36 @@
+plugins {
+    alias libs.plugins.c7x.bundler
+}
+
+dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    implementation libs.c7x.enginex
+    implementation project(path: ':common')
+}
+
+bundle {
+    modName = "GrowAGarden"
+    author = "GAG-Team"
+    mainClass = "gg.cristalix.growagarden.GrowAGardenMod"
+    modVersion = "1.0.0"
+    persistent = false
+    asyncModLoad = true
+}
+
+afterEvaluate {
+    tasks.TEST_uploadMod.dependsOn(tasks.bundle)
+}
+
+tasks.register('TEST_uploadMod') {
+    doLast {
+        ssh.run {
+            session(remotes.remote_server) {
+                put from: jar.getArchiveFile().get().getAsFile().getPath().replace("-raw", "-bundle"), into: System.getenv("C7X_TEST_SERVER_PATH") + "/mods"
+            }
+        }
+    }
+}
+
+jar.from configurations.runtimeClasspath.collect(project.&zipTree)
