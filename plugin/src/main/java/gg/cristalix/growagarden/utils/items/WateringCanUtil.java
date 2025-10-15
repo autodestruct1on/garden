@@ -10,8 +10,6 @@ import java.util.List;
 
 @UtilityClass
 public class WateringCanUtil {
-
-    public static final long WATERING_DURATION_MILLIS = 10 * 60 * 1000L; // 10 минут
     public static final int MAX_CHARGES = 3;
 
     /**

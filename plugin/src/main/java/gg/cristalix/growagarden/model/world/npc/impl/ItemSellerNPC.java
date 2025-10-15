@@ -12,6 +12,8 @@ import gg.cristalix.growagarden.service.hud.HudService;
 import gg.cristalix.growagarden.service.inventory.InventoryService;
 import gg.cristalix.wada.component.menu.selection.common.Selection;
 import gg.cristalix.wada.component.menu.selection.common.SelectionButton;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,13 +23,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ItemSellerNPC extends IWorldNPC {
 
-    private static final double WATERING_CAN_PRICE = 50.0;
-    private static final double SHOVEL_PRICE = 30.0;
+    static double WATERING_CAN_PRICE = 50.0;
+    static double SHOVEL_PRICE = 30.0;
+
+    GrowAGardenPlugin plugin;
 
     public ItemSellerNPC(Location location) {
         super(NPCData.of("§eПродавец инструментов", "", location));
+        this.plugin = GrowAGardenPlugin.getInstance();
     }
 
     @Override
@@ -93,8 +99,7 @@ public class ItemSellerNPC extends IWorldNPC {
             return;
         }
 
-        ItemCustomItem wateringCan = (ItemCustomItem) GrowAGardenPlugin.getInstance()
-                .getItemService().createItem("watering_can");
+        ItemCustomItem wateringCan = (ItemCustomItem) plugin.getItemService().createItem("watering_can");
 
         if (wateringCan == null) {
             AlertService.sendError(player, "§cОшибка: не удалось создать лейку");
@@ -130,8 +135,7 @@ public class ItemSellerNPC extends IWorldNPC {
             return;
         }
 
-        ItemCustomItem shovel = (ItemCustomItem) GrowAGardenPlugin.getInstance()
-                .getItemService().createItem("shovel");
+        ItemCustomItem shovel = (ItemCustomItem) plugin.getItemService().createItem("shovel");
 
         if (shovel == null) {
             AlertService.sendError(player, "§cОшибка: не удалось создать лопату");

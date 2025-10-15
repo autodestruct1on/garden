@@ -25,11 +25,16 @@ public class PlantGrowthTicker extends BukkitRunnable {
   @Getter
   static PlantGrowthTicker instance;
 
+  final GrowAGardenPlugin plugin;
   final Map<UUID, Map<String, PlantStageData>> playerPlantStageCache = new HashMap<>();
+
+  private PlantGrowthTicker(GrowAGardenPlugin plugin) {
+    this.plugin = plugin;
+  }
 
   @Override
   public void run() {
-    WorldState worldState = GrowAGardenPlugin.getInstance().getGameState().getWorldState();
+    WorldState worldState = plugin.getGameState().getWorldState();
 
     for (Player player : Bukkit.getOnlinePlayers()) {
       GamePlayer gamePlayer = player.getBungeePlayer();
@@ -55,8 +60,8 @@ public class PlantGrowthTicker extends BukkitRunnable {
         boolean currentWatered = syncData.isWatered();
 
         if (cachedData == null ||
-          cachedData.stage != currentStage ||
-          cachedData.watered != currentWatered) {
+                cachedData.stage != currentStage ||
+                cachedData.watered != currentWatered) {
 
           stageCache.put(positionKey, new PlantStageData(currentStage, currentWatered));
           V3 position = cell.getPoint();
@@ -76,7 +81,7 @@ public class PlantGrowthTicker extends BukkitRunnable {
     if (instance != null && !instance.isCancelled()) {
       return;
     }
-    instance = new PlantGrowthTicker();
+    instance = new PlantGrowthTicker(plugin);
     instance.runTaskTimer(plugin, GROWTH_TICK_INTERVAL, GROWTH_TICK_INTERVAL);
   }
 

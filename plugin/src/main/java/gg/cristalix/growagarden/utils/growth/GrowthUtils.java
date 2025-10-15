@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.utils.growth;
 
 import lombok.experimental.UtilityClass;
@@ -81,4 +82,4 @@ public class GrowthUtils {
         }
         return (long) (baseTime / multiplier);
     }
-}
+}*/

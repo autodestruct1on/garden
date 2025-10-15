@@ -10,10 +10,12 @@ import gg.cristalix.growagarden.model.item.ItemCustomItem;
 import gg.cristalix.growagarden.model.item.SeedCustomItem;
 import gg.cristalix.growagarden.model.player.GamePlayer;
 import gg.cristalix.growagarden.model.player.inventory.InventoryData;
+import gg.cristalix.growagarden.model.world.WorldState;
 import gg.cristalix.growagarden.service.alert.AlertService;
 import gg.cristalix.growagarden.service.garden.GardenService;
 import gg.cristalix.growagarden.service.inventory.InventoryService;
 import gg.cristalix.growagarden.service.network.ModSyncService;
+import gg.cristalix.growagarden.service.seed.SeedService;
 import gg.cristalix.growagarden.utils.GlobalCache;
 import gg.cristalix.growagarden.utils.map.MapUtil;
 import lombok.AccessLevel;
@@ -35,9 +37,11 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GardenInteractionListener implements Listener {
 
+  GrowAGardenPlugin plugin;
   Box cellZone;
 
-  public GardenInteractionListener() {
+  public GardenInteractionListener(GrowAGardenPlugin plugin) {
+    this.plugin = plugin;
     this.cellZone = (Box) MapUtil.mapCubouid.get("cell");
   }
 
@@ -105,7 +109,8 @@ public class GardenInteractionListener implements Listener {
       return;
     }
 
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(seed.getItemId());
+    SeedService seedService = plugin.getSeedService();
+    SeedData seedData = seedService.getSeedData(seed.getItemId());
     if (seedData != null) {
       AlertService.sendSuccess(player, "Посажено семя: §f" + seedData.getName());
     }
@@ -130,24 +135,22 @@ public class GardenInteractionListener implements Listener {
       return;
     }
 
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService()
-      .getSeedData(cell.getSeedInstance().getSeedId());
+    SeedService seedService = plugin.getSeedService();
+    SeedData seedData = seedService.getSeedData(cell.getSeedInstance().getSeedId());
 
     if (seedData == null) {
       return;
     }
 
-    if (!cell.getSeedInstance().isFullyGrown(seedData,
-      GrowAGardenPlugin.getInstance().getGameState().getWorldState())) {
-      double progress = GardenService.getGrowthProgress(cell,
-        GrowAGardenPlugin.getInstance().getGameState().getWorldState());
+    WorldState worldState = plugin.getGameState().getWorldState();
+    if (!cell.getSeedInstance().isFullyGrown(seedData, worldState)) {
+      double progress = GardenService.getGrowthProgress(cell, worldState);
       AlertService.sendWarning(player, "Растение ещё не созрело! Прогресс: §f" +
-        String.format("%.1f", progress) + "%");
+              String.format("%.1f", progress) + "%");
       return;
     }
 
-    CropCustomItem crop = GardenService.harvestCrop(gamePlayer, targetPoint,
-            GrowAGardenPlugin.getInstance().getGameState().getWorldState());
+    CropCustomItem crop = GardenService.harvestCrop(gamePlayer, targetPoint, worldState);
 
     if (crop == null) {
       AlertService.sendError(player, "Не удалось собрать урожай!");
@@ -161,11 +164,11 @@ public class GardenInteractionListener implements Listener {
 
     String cropName = seedData.getName().replace("Семена ", "");
     double totalWeight = crop.getInstances().stream()
-      .mapToDouble(CropCustomItem.CropInstance::getWeight)
-      .sum();
+            .mapToDouble(CropCustomItem.CropInstance::getWeight)
+            .sum();
 
     AlertService.sendSuccess(player, "Собран урожай: §f" + cropName + " §7(§f" +
-      String.format("%.2f", totalWeight) + " кг§7)");
+            String.format("%.2f", totalWeight) + " кг§7)");
 
     if (seedData.isMultiHarvest()) {
       CellData updatedCell = GardenService.getCellAt(gamePlayer, targetPoint);

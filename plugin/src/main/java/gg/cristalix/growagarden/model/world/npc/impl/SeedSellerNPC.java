@@ -12,8 +12,11 @@ import gg.cristalix.growagarden.service.alert.AlertService;
 import gg.cristalix.growagarden.service.hud.HudService;
 import gg.cristalix.growagarden.service.inventory.InventoryService;
 import gg.cristalix.growagarden.service.network.ModSyncService;
+import gg.cristalix.growagarden.service.seed.SeedService;
 import gg.cristalix.wada.component.menu.selection.common.Selection;
 import gg.cristalix.wada.component.menu.selection.common.SelectionButton;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -25,10 +28,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SeedSellerNPC extends IWorldNPC {
+
+  GrowAGardenPlugin plugin;
+  SeedService seedService;
 
   public SeedSellerNPC(Location location) {
     super(NPCData.of("§aПродавец семян", "", location));
+    this.plugin = GrowAGardenPlugin.getInstance();
+    this.seedService = plugin.getSeedService();
   }
 
   @Override
@@ -46,7 +55,7 @@ public class SeedSellerNPC extends IWorldNPC {
     categorizedButtons.put("TREE", new ArrayList<>());
     categorizedButtons.put("EXOTIC", new ArrayList<>());
 
-    Map<String, SeedData> seeds = GrowAGardenPlugin.getInstance().getSeedService().getSeedDataMap();
+    Map<String, SeedData> seeds = seedService.getSeedDataMap();
     for (SeedData seed : seeds.values()) {
       SelectionButton button = createSeedButton(seed, player);
       categorizedButtons.get(seed.getCategory().name()).add(button);
@@ -72,7 +81,7 @@ public class SeedSellerNPC extends IWorldNPC {
   }
 
   private SelectionButton createSeedButton(SeedData seedData, Player player) {
-    double price = GrowAGardenPlugin.getInstance().getSeedService().calculateSeedPrice(seedData);
+    double price = seedService.calculateSeedPrice(seedData);
     ItemStack seedItem = createSeedItemStack(seedData);
     String categoryColor = seedData.getCategory().getColorCode();
     String growTimeText = formatGrowTime(seedData.getGrowTimeMillis());
@@ -103,8 +112,7 @@ public class SeedSellerNPC extends IWorldNPC {
       return;
     }
 
-    SeedCustomItem seed = (SeedCustomItem) GrowAGardenPlugin.getInstance()
-            .getItemService().createItem(seedData.getId());
+    SeedCustomItem seed = (SeedCustomItem) plugin.getItemService().createItem(seedData.getId());
 
     if (seed == null) {
       AlertService.sendError(player, "§cОшибка: не удалось создать семя");
@@ -123,45 +131,30 @@ public class SeedSellerNPC extends IWorldNPC {
 
     HudService.updateHud(player);
     ModSyncService.syncInventory(player);
-
     menuManager.close(player);
   }
 
-  private String formatGrowTime(long millis) {
-    long minutes = millis / 60000;
-    if (minutes >= 60) {
-      long hours = minutes / 60;
-      long remainingMinutes = minutes % 60;
-      return hours + "ч " + remainingMinutes + "м";
+  private ItemStack createSeedItemStack(SeedData seedData) {
+    ItemStack item = new ItemStack(Material.CLAY_BALL);
+    ItemMeta meta = item.getItemMeta();
+    if (meta != null) {
+      meta.setDisplayName(seedData.getDisplayName());
+      item.setItemMeta(meta);
     }
-    return minutes + "м";
+    return item;
   }
 
-  private ItemStack createSeedItemStack(SeedData seedData) {
-    ItemStack item = new ItemStack(Material.CLAY_BALL, 1);
-    ItemMeta meta = item.getItemMeta();
+  private String formatGrowTime(long millis) {
+    long seconds = millis / 1000;
+    long minutes = seconds / 60;
+    long hours = minutes / 60;
 
-    meta.setDisplayName(seedData.getName());
-
-    List<String> lore = new ArrayList<>();
-    lore.add("§7Категория: §f" + seedData.getCategory().getDisplayName());
-    lore.add("§7Стадии роста: §f" + seedData.getStages());
-    lore.add("§7Время роста: §f" + (seedData.getGrowTimeMillis() / 60000) + " мин");
-    lore.add("§7Вес плода: §f" + String.format("%.1f-%.1f", seedData.getBaseWeightKgMin(), seedData.getBaseWeightKgMax()) + " кг");
-    lore.add("§7Базовая цена плода: §6" + TextUtil.parseNumber(seedData.getBaseValue(), 0) + " монет/кг");
-
-    if (seedData.isMultiHarvest()) {
-      lore.add("§aМожно собирать многократно");
+    if (hours > 0) {
+      return hours + "ч " + (minutes % 60) + "м";
+    } else if (minutes > 0) {
+      return minutes + "м";
     } else {
-      lore.add("§cОднократный сбор");
+      return seconds + "с";
     }
-
-    lore.add("");
-    lore.add("§8ПКМ по грядке для посадки");
-
-    meta.setLore(lore);
-    item.setItemMeta(meta);
-
-    return item;
   }
 }

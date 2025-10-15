@@ -13,8 +13,11 @@ import gg.cristalix.growagarden.model.world.WorldState;
 import gg.cristalix.growagarden.model.world.weather.WeatherData;
 import gg.cristalix.growagarden.network.ModChannels;
 import gg.cristalix.growagarden.network.data.PlantSyncData;
+import gg.cristalix.growagarden.service.seed.SeedService;
 import gg.cristalix.wada.transfer.ModTransfer;
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.math.V3;
 
@@ -22,15 +25,49 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
-@UtilityClass
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ModSyncService {
 
-  public void syncFullData(Player player) {
-    syncInventory(player);
-    syncGarden(player);
+  @Getter
+  static ModSyncService instance = new ModSyncService();
+
+  GrowAGardenPlugin plugin;
+
+  private ModSyncService() {
+    this.plugin = GrowAGardenPlugin.getInstance();
   }
 
-  public void syncInventory(Player player) {
+  public static void syncFullData(Player player) {
+    instance.syncInventory(player);
+    instance.syncGarden(player);
+  }
+
+  public static void syncInventory(Player player) {
+    instance.doSyncInventory(player);
+  }
+
+  public static void syncGarden(Player player) {
+    instance.doSyncGarden(player);
+  }
+
+  public static void syncPlantUpdate(Player player, V3 position, CellData cell) {
+    instance.doSyncPlantUpdate(player, position, cell);
+  }
+
+  public static void syncPlantRemove(Player player, V3 position) {
+    instance.doSyncPlantRemove(player, position);
+  }
+
+  public static void syncWeather(Player player) {
+    instance.doSyncWeather(player);
+  }
+
+  @Nullable
+  public static PlantSyncData createPlantSyncData(CellData cell, WorldState worldState) {
+    return instance.doCreatePlantSyncData(cell, worldState);
+  }
+
+  private void doSyncInventory(Player player) {
     GamePlayer gamePlayer = player.getBungeePlayer();
     if (gamePlayer == null) return;
 
@@ -75,11 +112,11 @@ public class ModSyncService {
     transfer.send(ModChannels.INVENTORY_SYNC, player);
   }
 
-  public void syncGarden(Player player) {
+  private void doSyncGarden(Player player) {
     GamePlayer gamePlayer = player.getBungeePlayer();
     if (gamePlayer == null) return;
 
-    WorldState worldState = GrowAGardenPlugin.getInstance().getGameState().getWorldState();
+    WorldState worldState = plugin.getGameState().getWorldState();
     Map<String, CellData> cells = gamePlayer.getGarden().getAllPlantedCells();
 
     ModTransfer transfer = new ModTransfer();
@@ -99,9 +136,9 @@ public class ModSyncService {
     transfer.send(ModChannels.GARDEN_SYNC, player);
   }
 
-  public void syncPlantUpdate(Player player, V3 position, CellData cell) {
-    WorldState worldState = GrowAGardenPlugin.getInstance().getGameState().getWorldState();
-    PlantSyncData syncData = createPlantSyncData(cell, worldState);
+  private void doSyncPlantUpdate(Player player, V3 position, CellData cell) {
+    WorldState worldState = plugin.getGameState().getWorldState();
+    PlantSyncData syncData = doCreatePlantSyncData(cell, worldState);
 
     if (syncData == null) return;
 
@@ -119,11 +156,10 @@ public class ModSyncService {
 
     transfer.send(ModChannels.PLANT_UPDATE, player);
 
-    GrowAGardenPlugin.getInstance().getGardenMod().getCropMod().sendCrop(player, position, "banana_stage_1");
-
+    plugin.getGardenMod().getCropMod().sendCrop(player, position, "banana_stage_1");
   }
 
-  public void syncPlantRemove(Player player, V3 position) {
+  private void doSyncPlantRemove(Player player, V3 position) {
     ModTransfer transfer = new ModTransfer();
 
     transfer.writeDouble(position.getX());
@@ -144,7 +180,8 @@ public class ModSyncService {
       return;
     }
 
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(instance.getSeedId());
+    SeedService seedService = plugin.getSeedService();
+    SeedData seedData = seedService.getSeedData(instance.getSeedId());
     if (seedData == null) {
       transfer.writeString("");
       transfer.writeInt(0);
@@ -162,11 +199,12 @@ public class ModSyncService {
   }
 
   @Nullable
-  public PlantSyncData createPlantSyncData(CellData cell, WorldState worldState) {
+  private PlantSyncData doCreatePlantSyncData(CellData cell, WorldState worldState) {
     SeedInstance instance = cell.getSeedInstance();
     if (instance == null) return null;
 
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(instance.getSeedId());
+    SeedService seedService = plugin.getSeedService();
+    SeedData seedData = seedService.getSeedData(instance.getSeedId());
     if (seedData == null) return null;
 
     return new PlantSyncData(
@@ -178,8 +216,8 @@ public class ModSyncService {
     );
   }
 
-  public void syncWeather(Player player) {
-    WorldState worldState = GrowAGardenPlugin.getInstance().getGameState().getWorldState();
+  private void doSyncWeather(Player player) {
+    WorldState worldState = plugin.getGameState().getWorldState();
     WeatherData currentWeather = worldState.getCurrentWeather();
 
     if (currentWeather == null) {
