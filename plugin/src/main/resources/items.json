@@ -1,0 +1,486 @@
+{
+  "seeds": {
+    "tomato": {
+      "id": "tomato",
+      "name": "Семена помидора",
+      "displayName": "§cПомидор",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 600000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.5,
+      "baseWeightKgMax": 1.5,
+      "baseValue": 10.0,
+      "seedPrice": 3.0,
+      "nbt": {
+        "seed_id": "tomato"
+      }
+    },
+    "potato": {
+      "id": "potato",
+      "name": "Семена картофеля",
+      "displayName": "§eКартофель",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 900000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 2.0,
+      "baseWeightKgMax": 5.0,
+      "baseValue": 8.0,
+      "seedPrice": 2.4,
+      "nbt": {
+        "seed_id": "potato"
+      }
+    },
+    "carrot": {
+      "id": "carrot",
+      "name": "Семена моркови",
+      "displayName": "§6Морковь",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 2,
+      "growTimeMillis": 300000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.3,
+      "baseWeightKgMax": 0.8,
+      "baseValue": 6.0,
+      "seedPrice": 1.8,
+      "nbt": {
+        "seed_id": "carrot"
+      }
+    },
+    "cucumber": {
+      "id": "cucumber",
+      "name": "Семена огурца",
+      "displayName": "§aОгурец",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 450000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.4,
+      "baseWeightKgMax": 1.0,
+      "baseValue": 12.0,
+      "seedPrice": 3.6,
+      "nbt": {
+        "seed_id": "cucumber"
+      }
+    },
+    "cabbage": {
+      "id": "cabbage",
+      "name": "Семена капусты",
+      "displayName": "§aКапуста",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 1200000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 3.0,
+      "baseWeightKgMax": 7.0,
+      "baseValue": 15.0,
+      "seedPrice": 4.5,
+      "nbt": {
+        "seed_id": "cabbage"
+      }
+    },
+    "onion": {
+      "id": "onion",
+      "name": "Семена лука",
+      "displayName": "§fЛук",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 2,
+      "growTimeMillis": 480000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.5,
+      "baseWeightKgMax": 1.2,
+      "baseValue": 7.0,
+      "seedPrice": 2.1,
+      "nbt": {
+        "seed_id": "onion"
+      }
+    },
+    "pepper": {
+      "id": "pepper",
+      "name": "Семена перца",
+      "displayName": "§cПерец",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 600000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.2,
+      "baseWeightKgMax": 0.5,
+      "baseValue": 18.0,
+      "seedPrice": 5.4,
+      "nbt": {
+        "seed_id": "pepper"
+      }
+    },
+    "eggplant": {
+      "id": "eggplant",
+      "name": "Семена баклажана",
+      "displayName": "§5Баклажан",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 750000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.8,
+      "baseWeightKgMax": 2.0,
+      "baseValue": 20.0,
+      "seedPrice": 6.0,
+      "nbt": {
+        "seed_id": "eggplant"
+      }
+    },
+    "strawberry": {
+      "id": "strawberry",
+      "name": "Семена клубники",
+      "displayName": "§cКлубника",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 500000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.05,
+      "baseWeightKgMax": 0.15,
+      "baseValue": 25.0,
+      "seedPrice": 7.5,
+      "nbt": {
+        "seed_id": "strawberry"
+      }
+    },
+    "pumpkin": {
+      "id": "pumpkin",
+      "name": "Семена тыквы",
+      "displayName": "§6Тыква",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 4,
+      "growTimeMillis": 1800000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 5.0,
+      "baseWeightKgMax": 15.0,
+      "baseValue": 40.0,
+      "seedPrice": 12.0,
+      "nbt": {
+        "seed_id": "pumpkin"
+      }
+    },
+    "watermelon": {
+      "id": "watermelon",
+      "name": "Семена арбуза",
+      "displayName": "§aАрбуз",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 4,
+      "growTimeMillis": 2400000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 8.0,
+      "baseWeightKgMax": 20.0,
+      "baseValue": 50.0,
+      "seedPrice": 15.0,
+      "nbt": {
+        "seed_id": "watermelon"
+      }
+    },
+    "lettuce": {
+      "id": "lettuce",
+      "name": "Семена салата",
+      "displayName": "§aСалат",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 2,
+      "growTimeMillis": 400000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.2,
+      "baseWeightKgMax": 0.6,
+      "baseValue": 9.0,
+      "seedPrice": 2.7,
+      "nbt": {
+        "seed_id": "lettuce"
+      }
+    },
+    "corn": {
+      "id": "corn",
+      "name": "Семена кукурузы",
+      "displayName": "§eКукуруза",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 900000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.3,
+      "baseWeightKgMax": 0.8,
+      "baseValue": 15.0,
+      "seedPrice": 4.5,
+      "nbt": {
+        "seed_id": "corn"
+      }
+    },
+    "garlic": {
+      "id": "garlic",
+      "name": "Семена чеснока",
+      "displayName": "§fЧеснок",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 2,
+      "growTimeMillis": 350000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.1,
+      "baseWeightKgMax": 0.3,
+      "baseValue": 12.0,
+      "seedPrice": 3.6,
+      "nbt": {
+        "seed_id": "garlic"
+      }
+    },
+    "radish": {
+      "id": "radish",
+      "name": "Семена редиса",
+      "displayName": "§cРедис",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 2,
+      "growTimeMillis": 250000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.2,
+      "baseWeightKgMax": 0.5,
+      "baseValue": 7.0,
+      "seedPrice": 2.1,
+      "nbt": {
+        "seed_id": "radish"
+      }
+    },
+    "beetroot": {
+      "id": "beetroot",
+      "name": "Семена свеклы",
+      "displayName": "§5Свекла",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 2,
+      "growTimeMillis": 400000,
+      "multiHarvest": false,
+      "baseWeightKgMin": 0.4,
+      "baseWeightKgMax": 1.0,
+      "baseValue": 8.0,
+      "seedPrice": 2.4,
+      "nbt": {
+        "seed_id": "beetroot"
+      }
+    },
+    "blueberry": {
+      "id": "blueberry",
+      "name": "Семена черники",
+      "displayName": "§9Черника",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 700000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.05,
+      "baseWeightKgMax": 0.12,
+      "baseValue": 28.0,
+      "seedPrice": 8.4,
+      "nbt": {
+        "seed_id": "blueberry"
+      }
+    },
+    "raspberry": {
+      "id": "raspberry",
+      "name": "Семена малины",
+      "displayName": "§cМалина",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 3,
+      "growTimeMillis": 650000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.04,
+      "baseWeightKgMax": 0.1,
+      "baseValue": 27.0,
+      "seedPrice": 8.1,
+      "nbt": {
+        "seed_id": "raspberry"
+      }
+    },
+    "grape": {
+      "id": "grape",
+      "name": "Семена винограда",
+      "displayName": "§5Виноград",
+      "material": "CLAY_BALL",
+      "category": "BASE",
+      "stages": 4,
+      "growTimeMillis": 1200000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.05,
+      "baseWeightKgMax": 0.2,
+      "baseValue": 30.0,
+      "seedPrice": 9.0,
+      "nbt": {
+        "seed_id": "grape"
+      }
+    },
+    "apple": {
+      "id": "apple",
+      "name": "Саженец яблони",
+      "displayName": "§cЯблоко",
+      "material": "CLAY_BALL",
+      "category": "TREE",
+      "stages": 5,
+      "growTimeMillis": 7200000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.15,
+      "baseWeightKgMax": 0.4,
+      "baseValue": 35.0,
+      "seedPrice": 15.75,
+      "nbt": {
+        "seed_id": "apple"
+      }
+    },
+    "pear": {
+      "id": "pear",
+      "name": "Саженец груши",
+      "displayName": "§aГруша",
+      "material": "CLAY_BALL",
+      "category": "TREE",
+      "stages": 5,
+      "growTimeMillis": 7500000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.2,
+      "baseWeightKgMax": 0.5,
+      "baseValue": 36.0,
+      "seedPrice": 16.2,
+      "nbt": {
+        "seed_id": "pear"
+      }
+    },
+    "cherry": {
+      "id": "cherry",
+      "name": "Саженец вишни",
+      "displayName": "§cВишня",
+      "material": "CLAY_BALL",
+      "category": "TREE",
+      "stages": 5,
+      "growTimeMillis": 8000000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.02,
+      "baseWeightKgMax": 0.05,
+      "baseValue": 40.0,
+      "seedPrice": 18.0,
+      "nbt": {
+        "seed_id": "cherry"
+      }
+    },
+    "peach": {
+      "id": "peach",
+      "name": "Саженец персика",
+      "displayName": "§6Персик",
+      "material": "CLAY_BALL",
+      "category": "TREE",
+      "stages": 5,
+      "growTimeMillis": 7800000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.12,
+      "baseWeightKgMax": 0.3,
+      "baseValue": 42.0,
+      "seedPrice": 18.9,
+      "nbt": {
+        "seed_id": "peach"
+      }
+    },
+    "coffee": {
+      "id": "coffee",
+      "name": "Семена кофе",
+      "displayName": "§6Кофейные зерна",
+      "material": "CLAY_BALL",
+      "category": "EXOTIC",
+      "stages": 4,
+      "growTimeMillis": 3600000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.01,
+      "baseWeightKgMax": 0.02,
+      "baseValue": 60.0,
+      "seedPrice": 36.0,
+      "nbt": {
+        "seed_id": "coffee"
+      }
+    },
+    "cocoa": {
+      "id": "cocoa",
+      "name": "Семена какао",
+      "displayName": "§6Бобы какао",
+      "material": "CLAY_BALL",
+      "category": "EXOTIC",
+      "stages": 4,
+      "growTimeMillis": 4000000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.02,
+      "baseWeightKgMax": 0.05,
+      "baseValue": 65.0,
+      "seedPrice": 39.0,
+      "nbt": {
+        "seed_id": "cocoa"
+      }
+    },
+    "tea": {
+      "id": "tea",
+      "name": "Семена чая",
+      "displayName": "§aЧайный лист",
+      "material": "CLAY_BALL",
+      "category": "EXOTIC",
+      "stages": 3,
+      "growTimeMillis": 2400000,
+      "multiHarvest": true,
+      "baseWeightKgMin": 0.01,
+      "baseWeightKgMax": 0.03,
+      "baseValue": 55.0,
+      "seedPrice": 33.0,
+      "nbt": {
+        "seed_id": "tea"
+      }
+    }
+  },
+  "items": {
+    "watering_can": {
+      "id": "watering_can",
+      "name": "§bЛейка",
+      "displayName": "§bЛейка",
+      "material": "CLAY_BALL",
+      "itemEnum": "ITEM",
+      "price": 50.0,
+      "amountUsage": 3,
+      "nbt": {
+        "charges": "3"
+      },
+      "lore": [
+        "§7Заряды: §b3/3",
+        "§7Используется для полива растений",
+        "§7Ускоряет рост на 10% до сбора урожая",
+        "",
+        "§8ПКМ по грядке для полива"
+      ]
+    },
+    "shovel": {
+      "id": "shovel",
+      "name": "§eЛопата",
+      "displayName": "§eЛопата",
+      "material": "CLAY_BALL",
+      "itemEnum": "ITEM",
+      "price": 30.0,
+      "amountUsage": 1,
+      "nbt": {
+        "charges": "1"
+      },
+      "lore": [
+        "§7Заряды: §e1/1",
+        "§7Используется для выкапывания растений",
+        "",
+        "§8ПКМ по грядке для выкапывания",
+        "§cСемена не возвращаются"
+      ]
+    }
+  }
+}

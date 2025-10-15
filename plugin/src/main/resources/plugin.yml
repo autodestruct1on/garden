@@ -1,0 +1,6 @@
+name: GrowAGarden
+main: gg.cristalix.growagarden.GrowAGardenPlugin
+version: 1.0.0
+api-version: 1.12.2
+author: GAG-Team
+depend: [ CoreAPI ]

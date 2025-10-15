@@ -1,0 +1,41 @@
+group = "gg.cristalix.growagarden"
+version = "1.0.0"
+
+dependencies {
+    compileOnly libs.c7x.paper
+    compileOnly libs.c7x.core
+
+    implementation libs.c7x.wada
+    implementation libs.c7x.store
+
+    compileOnly libs.fastutil
+    compileOnly libs.gson
+
+    implementation project(path: ':common')
+}
+
+jar {
+    from configurations.runtimeClasspath.collect(project.&zipTree)
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+
+    archiveFileName = 'growagarden.jar'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+}
+
+afterEvaluate {
+    tasks.TEST_uploadPlugin.dependsOn(tasks.build)
+}
+
+tasks.register('TEST_uploadPlugin') {
+    doLast {
+        ssh.run {
+            session(remotes.remote_server) {
+                put from: jar.getArchiveFile().get().getAsFile(), into: System.getenv("C7X_TEST_SERVER_PATH") + "/plugins"
+            }
+        }
+    }
+}
