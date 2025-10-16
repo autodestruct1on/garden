@@ -26,8 +26,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ItemSellerNPC extends IWorldNPC {
 
-    static double WATERING_CAN_PRICE = 50.0;
-    static double SHOVEL_PRICE = 30.0;
+    private static final double WATERING_CAN_PRICE = 50.0;
+    private static final double SHOVEL_PRICE = 30.0;
 
     GrowAGardenPlugin plugin;
 

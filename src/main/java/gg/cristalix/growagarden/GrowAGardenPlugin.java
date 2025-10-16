@@ -103,7 +103,7 @@ public class GrowAGardenPlugin extends JavaPlugin {
     registerEvents(
       new PlayerChangeConnectionStateListener(playerDataService),
       new ConnectionListener(this),
-      new GardenInteractionListener(this)
+      new GardenInteractionListener()
     );
   }
 
