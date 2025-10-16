@@ -15,10 +15,13 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @UtilityClass
 public class ConfigLoader {
+
+    private static final String SEED_UUID_NAMESPACE = "growagarden-seeds";
 
     public Map<String, SeedData> loadSeeds(InputStream stream) {
         if (stream == null) {
@@ -38,7 +41,10 @@ public class ConfigLoader {
                 throw new RuntimeException("No seeds loaded from config");
             }
 
-            seeds.forEach((id, data) -> data.setId(id));
+            seeds.forEach((id, data) -> {
+                data.setId(id);
+                data.setUuid(generateUuid(id));
+            });
 
             log.info("Successfully loaded {} seed definitions", seeds.size());
             return seeds;
@@ -47,6 +53,11 @@ public class ConfigLoader {
             log.error("Failed to load seeds config", e);
             throw new RuntimeException("Critical error loading seed configuration", e);
         }
+    }
+
+    private UUID generateUuid(String seedId) {
+        String fullName = SEED_UUID_NAMESPACE + ":" + seedId;
+        return UUID.nameUUIDFromBytes(fullName.getBytes(StandardCharsets.UTF_8));
     }
 
     public Map<String, CustomItemData> loadItems(InputStream stream) {

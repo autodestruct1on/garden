@@ -1,6 +1,7 @@
 package gg.cristalix.growagarden.model.world.npc.impl;
 
 import gg.cristalix.growagarden.GrowAGardenPlugin;
+import gg.cristalix.growagarden.common.mod.inventory.ItemEnum;
 import gg.cristalix.growagarden.common.util.TextUtil;
 import gg.cristalix.growagarden.model.garden.vegetation.SeedData;
 import gg.cristalix.growagarden.model.item.SeedCustomItem;
@@ -11,7 +12,6 @@ import gg.cristalix.growagarden.model.world.npc.NPCData;
 import gg.cristalix.growagarden.service.alert.AlertService;
 import gg.cristalix.growagarden.service.hud.HudService;
 import gg.cristalix.growagarden.service.inventory.InventoryService;
-import gg.cristalix.growagarden.service.network.ModSyncService;
 import gg.cristalix.growagarden.service.seed.SeedService;
 import gg.cristalix.wada.component.menu.selection.common.Selection;
 import gg.cristalix.wada.component.menu.selection.common.SelectionButton;
@@ -24,9 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SeedSellerNPC extends IWorldNPC {
@@ -50,64 +48,55 @@ public class SeedSellerNPC extends IWorldNPC {
     GamePlayer gamePlayer = player.getBungeePlayer();
     double balance = gamePlayer != null ? gamePlayer.getBalance(CurrencyType.MONEY) : 0.0;
 
-    Map<String, List<SelectionButton>> categorizedButtons = new HashMap<>();
-    categorizedButtons.put("BASE", new ArrayList<>());
-    categorizedButtons.put("TREE", new ArrayList<>());
-    categorizedButtons.put("EXOTIC", new ArrayList<>());
-
-    Map<String, SeedData> seeds = seedService.getSeedDataMap();
-    for (SeedData seed : seeds.values()) {
-      SelectionButton button = createSeedButton(seed, player);
-      categorizedButtons.get(seed.getCategory().name()).add(button);
-    }
-
-    List<SelectionButton> allButtons = new ArrayList<>();
-    allButtons.addAll(categorizedButtons.get("BASE"));
-    allButtons.addAll(categorizedButtons.get("TREE"));
-    allButtons.addAll(categorizedButtons.get("EXOTIC"));
-
-    Selection.Builder builder = Selection.builder()
-            .title("§aМагазин семян")
+    Selection.Builder menuBuilder = Selection.builder()
+            .title("§aПродавец семян")
             .balance(TextUtil.parseNumber(balance, 2))
             .balanceSymbol("§6монет")
             .rows(4)
             .columns(3);
 
-    for (SelectionButton button : allButtons) {
-      builder.buttons(button);
+    for (SeedData seedData : seedService.getSeedDataMap().values()) {
+      double price = seedService.calculateSeedPrice(seedData);
+      String categoryColor = seedData.getCategory().getColorCode();
+
+      ItemStack icon = createSeedItemStack(seedData);
+      ItemMeta meta = icon.getItemMeta();
+      if (meta != null) {
+        meta.setDisplayName(categoryColor + seedData.getName());
+        List<String> lore = new ArrayList<>();
+        lore.add("§7Цена: §6" + TextUtil.parseNumber(price, 0) + " монет");
+        lore.add("§7Время роста: §f" + formatGrowTime(seedData.getGrowTimeMillis()));
+        lore.add("§7Стадий: §f" + seedData.getStages());
+        lore.add("§7Категория: §f" + seedData.getCategory().getDisplayName());
+        if (seedData.isMultiHarvest()) {
+          lore.add("§a✓ Многократный сбор");
+        }
+        lore.add("");
+        lore.add("§eНажмите, чтобы купить");
+        meta.setLore(lore);
+        icon.setItemMeta(meta);
+      }
+
+      SelectionButton seedButton = SelectionButton.builder()
+              .headerText(categoryColor + seedData.getName())
+              .subText("§6" + TextUtil.parseNumber(price, 0) + " монет")
+              .itemIcon(icon)
+              .onPlayerLeftClick((p, b) -> buySeed(p, seedData))
+              .build();
+
+      menuBuilder.buttons(seedButton);
     }
 
-    return builder.build();
+    return menuBuilder.build();
   }
 
-  private SelectionButton createSeedButton(SeedData seedData, Player player) {
-    double price = seedService.calculateSeedPrice(seedData);
-    ItemStack seedItem = createSeedItemStack(seedData);
-    String categoryColor = seedData.getCategory().getColorCode();
-    String growTimeText = formatGrowTime(seedData.getGrowTimeMillis());
-
-    return SelectionButton.builder()
-            .headerText(categoryColor + seedData.getName())
-            .subText("§7" + growTimeText)
-            .itemIcon(seedItem)
-            .price((int) price)
-            .formattedPrice("монет")
-            .onPlayerLeftClick((clickedPlayer, button) -> {
-              handleSeedPurchase(clickedPlayer, seedData, price);
-            })
-            .build();
-  }
-
-  private void handleSeedPurchase(Player player, SeedData seedData, double price) {
+  private void buySeed(Player player, SeedData seedData) {
     GamePlayer gamePlayer = player.getBungeePlayer();
 
-    if (gamePlayer == null) {
-      AlertService.sendError(player, "§cОшибка: данные игрока не найдены");
-      return;
-    }
+    double price = seedService.calculateSeedPrice(seedData);
 
-    if (!gamePlayer.hasBalance(CurrencyType.MONEY, price)) {
-      AlertService.sendError(player, "Недостаточно средств! Нужно: §6" +
+    if (gamePlayer.getBalance(CurrencyType.MONEY) < price) {
+      AlertService.sendError(player, "§cНедостаточно средств! Нужно: §6" +
               TextUtil.parseNumber(price, 0) + " монет");
       return;
     }
@@ -130,7 +119,7 @@ public class SeedSellerNPC extends IWorldNPC {
     AlertService.sendTransaction(player, "§7-§6" + TextUtil.parseNumber(price, 0) + " монет", 2.0);
 
     HudService.updateHud(player);
-    ModSyncService.syncInventory(player);
+    plugin.getGardenMod().getInventoryMod().openMenu(player, ItemEnum.ALL);
     menuManager.close(player);
   }
 

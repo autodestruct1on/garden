@@ -11,6 +11,7 @@ import gg.cristalix.growagarden.model.world.npc.NPCData;
 import gg.cristalix.growagarden.service.alert.AlertService;
 import gg.cristalix.growagarden.service.hud.HudService;
 import gg.cristalix.growagarden.service.inventory.InventoryService;
+import gg.cristalix.growagarden.service.seed.SeedService;
 import gg.cristalix.wada.component.menu.selection.common.Selection;
 import gg.cristalix.wada.component.menu.selection.common.SelectionButton;
 import lombok.AccessLevel;
@@ -25,14 +26,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CropBuyerNPC extends IWorldNPC {
 
   private static final String NPC_DISPLAY_NAME = "§6Скупщик урожая";
 
+  GrowAGardenPlugin plugin;
+  SeedService seedService;
+
   public CropBuyerNPC(Location location) {
     super(NPCData.of(NPC_DISPLAY_NAME, "", location));
+    this.plugin = GrowAGardenPlugin.getInstance();
+    this.seedService = plugin.getSeedService();
   }
 
   @Override
@@ -97,8 +104,13 @@ public class CropBuyerNPC extends IWorldNPC {
 
     for (Map.Entry<String, CropCustomItem> entry : crops.entrySet()) {
       CropCustomItem crop = entry.getValue();
-      SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(crop.getItemId());
 
+      UUID seedUuid = seedService.getUuidByStringId(crop.getItemId());
+      if (seedUuid == null) {
+        continue;
+      }
+
+      SeedData seedData = seedService.getSeedDataByUUID(seedUuid);
       if (seedData == null) {
         continue;
       }
@@ -150,7 +162,7 @@ public class CropBuyerNPC extends IWorldNPC {
             .rows(4)
             .columns(3);
 
-    Map<String, SeedData> seeds = GrowAGardenPlugin.getInstance().getSeedService().getSeedDataMap();
+    Map<String, SeedData> seeds = seedService.getSeedDataMap();
     for (SeedData seed : seeds.values()) {
       String cropName = seed.getName().replace("Семена ", "");
       double pricePerKg = seed.getBaseValue();

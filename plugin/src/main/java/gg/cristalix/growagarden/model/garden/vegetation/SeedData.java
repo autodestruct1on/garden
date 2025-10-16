@@ -2,8 +2,11 @@ package gg.cristalix.growagarden.model.garden.vegetation;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class SeedData {
+    private UUID uuid;
     private String id;
     private String name;
     private String displayName;

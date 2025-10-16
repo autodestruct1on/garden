@@ -1,17 +1,15 @@
 package gg.cristalix.growagarden.service.network;
 
+import gg.cristalix.growagarden.GameState;
 import gg.cristalix.growagarden.GrowAGardenPlugin;
 import gg.cristalix.growagarden.model.garden.CellData;
 import gg.cristalix.growagarden.model.player.GamePlayer;
-import gg.cristalix.growagarden.model.world.WorldState;
-import gg.cristalix.growagarden.network.data.PlantSyncData;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import ru.cristalix.core.math.V3;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,51 +24,16 @@ public class PlantGrowthTicker extends BukkitRunnable {
   static PlantGrowthTicker instance;
 
   final GrowAGardenPlugin plugin;
+  final GameState gameState;
   final Map<UUID, Map<String, PlantStageData>> playerPlantStageCache = new HashMap<>();
 
   private PlantGrowthTicker(GrowAGardenPlugin plugin) {
     this.plugin = plugin;
+    this.gameState = plugin.getGameState();
   }
 
   @Override
   public void run() {
-    WorldState worldState = plugin.getGameState().getWorldState();
-
-    for (Player player : Bukkit.getOnlinePlayers()) {
-      GamePlayer gamePlayer = player.getBungeePlayer();
-      if (gamePlayer == null) continue;
-
-      UUID playerId = player.getUniqueId();
-      Map<String, PlantStageData> stageCache = playerPlantStageCache.computeIfAbsent(playerId, k -> new HashMap<>());
-
-      Map<String, CellData> cells = gamePlayer.getGarden().getAllPlantedCells();
-
-      for (Map.Entry<String, CellData> entry : cells.entrySet()) {
-        String positionKey = entry.getKey();
-        CellData cell = entry.getValue();
-
-        PlantSyncData syncData = ModSyncService.createPlantSyncData(cell, worldState);
-        if (syncData == null) {
-          stageCache.remove(positionKey);
-          continue;
-        }
-
-        PlantStageData cachedData = stageCache.get(positionKey);
-        int currentStage = syncData.getCurrentStage();
-        boolean currentWatered = syncData.isWatered();
-
-        if (cachedData == null ||
-                cachedData.stage != currentStage ||
-                cachedData.watered != currentWatered) {
-
-          stageCache.put(positionKey, new PlantStageData(currentStage, currentWatered));
-          V3 position = cell.getPoint();
-          ModSyncService.syncPlantUpdate(player, position, cell);
-        }
-      }
-
-      stageCache.keySet().removeIf(key -> !cells.containsKey(key));
-    }
   }
 
   public void clearCache(UUID playerId) {

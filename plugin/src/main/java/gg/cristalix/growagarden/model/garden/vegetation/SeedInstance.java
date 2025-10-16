@@ -6,66 +6,53 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SeedInstance {
-  String seedId;
+  UUID seedUuid;
   long plantedAtMillis;
-  boolean isWatered;
-  double calculatedFinalWeightKg;
+  boolean watered;
   boolean finalWeightCalculated;
-  Set<MutationType> mutations = new HashSet<>();
+  List<MutationType> mutations = new ArrayList<>();
 
   public void water() {
-    this.isWatered = true;
-  }
-
-  public void addMutation(MutationType mutation) {
-    if (mutation != MutationType.NONE) {
-      mutations.add(mutation);
-    }
+    this.watered = true;
   }
 
   public boolean hasMutation(MutationType mutation) {
     return mutations.contains(mutation);
   }
 
-  public double getTotalPriceMultiplier() {
-    if (mutations.isEmpty()) {
-      return 1.0;
+  public void addMutation(MutationType mutation) {
+    if (!hasMutation(mutation)) {
+      mutations.add(mutation);
     }
-
-    double multiplier = 1.0;
-    for (MutationType mutation : mutations) {
-      multiplier *= mutation.getPriceMultiplier();
-    }
-    return multiplier;
   }
 
-  public int calculateCurrentStage(SeedData seedData, WorldState worldState) {
-    if (seedData == null) return 0;
+  public boolean isFullyGrown(SeedData seedData, WorldState worldState) {
+    if (seedData == null) return false;
 
     long now = System.currentTimeMillis();
     long timeSincePlanting = now - plantedAtMillis;
 
     double effectiveTime = calculateEffectiveGrowthTime(timeSincePlanting, worldState);
-
-    int maxStages = seedData.getStages();
     long totalGrowTime = seedData.getGrowTimeMillis();
 
-    if (effectiveTime >= totalGrowTime) {
-      return maxStages;
-    }
-
-    int currentStage = (int) ((effectiveTime / totalGrowTime) * maxStages);
-    return Math.min(currentStage, maxStages);
+    return effectiveTime >= totalGrowTime;
   }
 
-  public boolean isFullyGrown(SeedData seedData, WorldState worldState) {
-    return calculateCurrentStage(seedData, worldState) >= seedData.getStages();
+  public int calculateCurrentStage(SeedData seedData, WorldState worldState) {
+    if (seedData == null) return 0;
+
+    int totalStages = Math.max(1, seedData.getStages());
+    double progress = getGrowthProgress(seedData, worldState);
+
+    int stage = (int) (progress * totalStages);
+    return Math.min(stage, totalStages);
   }
 
   public double getGrowthProgress(SeedData seedData, WorldState worldState) {
@@ -77,8 +64,10 @@ public class SeedInstance {
     double effectiveTime = calculateEffectiveGrowthTime(timeSincePlanting, worldState);
     long totalGrowTime = seedData.getGrowTimeMillis();
 
-    double progress = (effectiveTime / totalGrowTime) * 100.0;
-    return Math.min(progress, 100.0);
+    if (totalGrowTime <= 0) return 1.0;
+
+    double progress = effectiveTime / (double) totalGrowTime;
+    return Math.min(progress, 1.0);
   }
 
   public long getRemainingGrowTime(SeedData seedData, WorldState worldState) {
@@ -115,7 +104,7 @@ public class SeedInstance {
       }
     }
 
-    if (isWatered) {
+    if (watered) {
       multiplier *= 1.1;
     }
 

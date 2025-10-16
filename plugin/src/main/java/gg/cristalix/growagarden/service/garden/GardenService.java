@@ -9,12 +9,14 @@ import gg.cristalix.growagarden.model.garden.vegetation.SeedInstance;
 import gg.cristalix.growagarden.model.item.CropCustomItem;
 import gg.cristalix.growagarden.model.player.GamePlayer;
 import gg.cristalix.growagarden.model.world.WorldState;
+import gg.cristalix.growagarden.service.seed.SeedService;
 import lombok.experimental.UtilityClass;
 import ru.cristalix.core.math.V3;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
@@ -26,19 +28,21 @@ public class GardenService {
     return !player.getGarden().hasPlantInRadius(position, MIN_PLANT_DISTANCE);
   }
 
-  public boolean plantSeed(GamePlayer player, V3 position, String seedId) {
+  public boolean plantSeed(GamePlayer player, V3 position, UUID seedUuid) {
     if (!canPlantAt(player, position)) {
       return false;
     }
 
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(seedId);
+    SeedService seedService = GrowAGardenPlugin.getInstance().getSeedService();
+    SeedData seedData = seedService.getSeedDataByUUID(seedUuid);
+
     if (seedData == null) {
       return false;
     }
 
     long now = System.currentTimeMillis();
     SeedInstance instance = new SeedInstance();
-    instance.setSeedId(seedData.getId());
+    instance.setSeedUuid(seedData.getUuid());
     instance.setPlantedAtMillis(now);
     instance.setWatered(false);
     instance.setFinalWeightCalculated(false);
@@ -58,7 +62,8 @@ public class GardenService {
     }
 
     SeedInstance instance = cell.getSeedInstance();
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(instance.getSeedId());
+    SeedService seedService = GrowAGardenPlugin.getInstance().getSeedService();
+    SeedData seedData = seedService.getSeedDataByUUID(instance.getSeedUuid());
 
     if (seedData == null || !instance.isFullyGrown(seedData, worldState)) {
       return null;
@@ -123,7 +128,8 @@ public class GardenService {
     }
 
     SeedInstance instance = cell.getSeedInstance();
-    SeedData seedData = GrowAGardenPlugin.getInstance().getSeedService().getSeedData(instance.getSeedId());
+    SeedService seedService = GrowAGardenPlugin.getInstance().getSeedService();
+    SeedData seedData = seedService.getSeedDataByUUID(instance.getSeedUuid());
 
     if (seedData == null) {
       return 0.0;
