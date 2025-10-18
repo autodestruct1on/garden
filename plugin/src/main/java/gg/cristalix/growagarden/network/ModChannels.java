@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.network;
 
 import lombok.experimental.UtilityClass;
@@ -9,4 +10,4 @@ public class ModChannels {
     public static final String PLANT_UPDATE = "gag:plant_update";
     public static final String PLANT_REMOVE = "gag:plant_remove";
     public static final String WEATHER_SYNC = "gag:weather_sync";
-}
+}*/

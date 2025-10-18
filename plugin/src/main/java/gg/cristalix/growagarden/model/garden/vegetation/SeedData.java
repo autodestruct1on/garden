@@ -1,21 +1,21 @@
 package gg.cristalix.growagarden.model.garden.vegetation;
 
+import lombok.AccessLevel;
 import lombok.Data;
-
-import java.util.UUID;
+import lombok.experimental.FieldDefaults;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SeedData {
-    private UUID uuid;
-    private String id;
-    private String name;
-    private String displayName;
-    private SeedCategory category;
-    private int stages;
-    private long growTimeMillis;
-    private boolean multiHarvest;
-    private double baseWeightKgMin;
-    private double baseWeightKgMax;
-    private double baseValue;
-    private double seedPrice;
+  String id;
+  String name;
+  String displayName;
+  SeedCategory category;
+  int stages;
+  long growTimeMillis;
+  boolean multiHarvest;
+  double baseWeightKgMin;
+  double baseWeightKgMax;
+  double baseValue;
+  double seedPrice;
 }

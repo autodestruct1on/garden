@@ -11,8 +11,7 @@ import gg.cristalix.growagarden.model.world.npc.IWorldNPC;
 import gg.cristalix.growagarden.model.world.npc.NPCData;
 import gg.cristalix.growagarden.service.alert.AlertService;
 import gg.cristalix.growagarden.service.hud.HudService;
-import gg.cristalix.growagarden.service.inventory.InventoryService;
-import gg.cristalix.growagarden.service.seed.SeedService;
+import gg.cristalix.growagarden.service.item.seed.SeedService;
 import gg.cristalix.wada.component.menu.selection.common.Selection;
 import gg.cristalix.wada.component.menu.selection.common.SelectionButton;
 import lombok.AccessLevel;
@@ -49,11 +48,11 @@ public class SeedSellerNPC extends IWorldNPC {
     double balance = gamePlayer != null ? gamePlayer.getBalance(CurrencyType.MONEY) : 0.0;
 
     Selection.Builder menuBuilder = Selection.builder()
-            .title("§aПродавец семян")
-            .balance(TextUtil.parseNumber(balance, 2))
-            .balanceSymbol("§6монет")
-            .rows(4)
-            .columns(3);
+      .title("§aПродавец семян")
+      .balance(TextUtil.parseNumber(balance, 2))
+      .balanceSymbol("§6монет")
+      .rows(4)
+      .columns(3);
 
     for (SeedData seedData : seedService.getSeedDataMap().values()) {
       double price = seedService.calculateSeedPrice(seedData);
@@ -78,11 +77,11 @@ public class SeedSellerNPC extends IWorldNPC {
       }
 
       SelectionButton seedButton = SelectionButton.builder()
-              .headerText(categoryColor + seedData.getName())
-              .subText("§6" + TextUtil.parseNumber(price, 0) + " монет")
-              .itemIcon(icon)
-              .onPlayerLeftClick((p, b) -> buySeed(p, seedData))
-              .build();
+        .headerText(categoryColor + seedData.getName())
+        .subText("§6" + TextUtil.parseNumber(price, 0) + " монет")
+        .itemIcon(icon)
+        .onPlayerLeftClick((p, b) -> buySeed(p, seedData))
+        .build();
 
       menuBuilder.buttons(seedButton);
     }
@@ -97,7 +96,7 @@ public class SeedSellerNPC extends IWorldNPC {
 
     if (gamePlayer.getBalance(CurrencyType.MONEY) < price) {
       AlertService.sendError(player, "§cНедостаточно средств! Нужно: §6" +
-              TextUtil.parseNumber(price, 0) + " монет");
+        TextUtil.parseNumber(price, 0) + " монет");
       return;
     }
 
@@ -108,7 +107,7 @@ public class SeedSellerNPC extends IWorldNPC {
       return;
     }
 
-    if (!InventoryService.addSeed(gamePlayer, seed)) {
+    if (!gamePlayer.getInventoryData().addItem(seed)) {
       AlertService.sendError(player, "Инвентарь переполнен! Освободите место.");
       return;
     }

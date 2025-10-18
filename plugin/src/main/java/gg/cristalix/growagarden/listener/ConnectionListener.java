@@ -4,7 +4,7 @@ import gg.cristalix.growagarden.GrowAGardenPlugin;
 import gg.cristalix.growagarden.model.player.GamePlayer;
 import gg.cristalix.growagarden.service.alert.AlertService;
 import gg.cristalix.growagarden.service.hud.HudService;
-import gg.cristalix.growagarden.service.network.PlantGrowthTicker;
+import gg.cristalix.growagarden.service.world.PlantGrowthTicker;
 import gg.cristalix.growagarden.utils.GlobalCache;
 import gg.cristalix.growagarden.utils.map.MapUtil;
 import lombok.AllArgsConstructor;

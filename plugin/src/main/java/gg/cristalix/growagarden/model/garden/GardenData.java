@@ -1,9 +1,9 @@
 package gg.cristalix.growagarden.model.garden;
 
+import gg.cristalix.wada.math.V3;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.cristalix.core.math.V3;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,11 +41,9 @@ public class GardenData {
     for (CellData cell : plantedCells.values()) {
       V3 cellPos = cell.getPoint();
       double distanceSquared = Math.pow(cellPos.getX() - position.getX(), 2) +
-              Math.pow(cellPos.getZ() - position.getZ(), 2);
+        Math.pow(cellPos.getZ() - position.getZ(), 2);
 
-      if (distanceSquared <= radiusSquared) {
-        return true;
-      }
+      if (distanceSquared <= radiusSquared) return true;
     }
 
     return false;
@@ -58,8 +56,8 @@ public class GardenData {
 
   private String positionToKey(V3 position) {
     return String.format("%.2f_%.2f_%.2f",
-            position.getX(),
-            position.getY(),
-            position.getZ());
+      position.getX(),
+      position.getY(),
+      position.getZ());
   }
 }

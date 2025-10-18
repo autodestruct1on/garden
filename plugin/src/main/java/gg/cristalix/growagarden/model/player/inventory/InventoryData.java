@@ -39,12 +39,44 @@ public class InventoryData {
   }
 
   public CustomItem getCustomItem(ItemEnum itemEnum, UUID uuid) {
-    return switch (itemEnum) {
-      case ITEM -> itemInventoryData.getItemByUUID(uuid);
-      case CROP -> cropInventoryData.getItemByUUID(uuid);
-      case SEED -> seedInventoryData.getItemByUUID(uuid);
+    return getInventory(itemEnum).getItemByUUID(uuid);
+  }
+
+  public <T extends CustomItem> CustomInventoryData<T> getInventory(ItemEnum itemEnum) {
+    return (CustomInventoryData<T>) switch (itemEnum) {
+      case ITEM -> itemInventoryData;
+      case CROP -> cropInventoryData;
+      case SEED -> seedInventoryData;
       default -> null;
     };
+  }
+
+  public boolean addItem(CustomItem customItem) {
+    return getInventory(customItem.getItemEnum()).addItem(customItem);
+  }
+
+  public <T extends CustomItem> T removeItem(ItemEnum itemEnum, String itemId) {
+    return (T) getInventory(itemEnum).removeItem(itemId);
+  }
+
+  public boolean decreaseItemAmount(ItemEnum itemEnum, String itemId, int count) {
+    return getInventory(itemEnum).removeItem(itemId, count);
+  }
+
+  public <T extends CustomItem> T getItemByUUID(ItemEnum itemEnum, UUID uuid) {
+    return (T) getInventory(itemEnum).getItemByUUID(uuid);
+  }
+
+  public boolean hasItem(ItemEnum itemEnum, String itemId) {
+    return getInventory(itemEnum).hasItem(itemId);
+  }
+
+  public int getItemCount(ItemEnum itemEnum, String itemId) {
+    return getInventory(itemEnum).getItemCount(itemId);
+  }
+
+  public boolean canAddItem(ItemEnum itemEnum, CustomItem customItem) {
+    return getInventory(itemEnum).canAddItem(customItem);
   }
 
   public CustomInventoryData<?>[] getAllInventory() {

@@ -1,22 +1,18 @@
 package gg.cristalix.growagarden.model.garden;
 
 import gg.cristalix.growagarden.model.garden.vegetation.SeedInstance;
+import gg.cristalix.wada.math.V3;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import ru.cristalix.core.math.V3;
-
-import javax.annotation.Nullable;
 
 @Getter
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@ToString
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CellData {
-  final V3 point;
-
-  @Setter
-  @Nullable
+  V3 point;
   SeedInstance seedInstance;
 }

@@ -9,8 +9,8 @@ import gg.cristalix.growagarden.model.item.CustomItemData;
 import gg.cristalix.growagarden.model.player.GamePlayer;
 import gg.cristalix.growagarden.model.world.npc.GardenNPCManager;
 import gg.cristalix.growagarden.service.item.ItemService;
-import gg.cristalix.growagarden.service.network.PlantGrowthTicker;
-import gg.cristalix.growagarden.service.seed.SeedService;
+import gg.cristalix.growagarden.service.world.PlantGrowthTicker;
+import gg.cristalix.growagarden.service.item.seed.SeedService;
 import gg.cristalix.growagarden.service.world.WeatherService;
 import gg.cristalix.growagarden.service.world.WeatherTicker;
 import gg.cristalix.growagarden.utils.gson.LocationSerializer;
@@ -71,13 +71,11 @@ public class GrowAGardenPlugin extends JavaPlugin {
     instance = this;
 
     this.gameState = new GameState();
-
     loadWada();
-    this.gardenMod = new GardenMod(this);
-
     loadCoreApi();
     initializeDatabase();
     loadConfiguration();
+    this.gardenMod = new GardenMod(this);
     initializeWeather();
     registerEvents();
     initializeNPCs();

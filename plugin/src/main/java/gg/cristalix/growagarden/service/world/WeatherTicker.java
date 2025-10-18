@@ -20,68 +20,65 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WeatherTicker extends BukkitRunnable {
 
-    static final int WEATHER_CHECK_INTERVAL = 100;
+  static final int WEATHER_CHECK_INTERVAL = 100;
 
-    @Getter
-    static WeatherTicker instance;
+  @Getter
+  static WeatherTicker instance;
 
-    final WeatherService weatherService;
-    final WorldState worldState;
+  final WeatherService weatherService;
+  final WorldState worldState;
 
-    public WeatherTicker(WeatherService weatherService, WorldState worldState) {
-        this.weatherService = weatherService;
-        this.worldState = worldState;
+  public WeatherTicker(WeatherService weatherService, WorldState worldState) {
+    this.weatherService = weatherService;
+    this.worldState = worldState;
+  }
+
+  @Override
+  public void run() {
+    if (weatherService.shouldChangeWeather(worldState)) {
+      WeatherData oldWeather = worldState.getCurrentWeather();
+      weatherService.changeWeather(worldState);
+      WeatherData newWeather = worldState.getCurrentWeather();
+
+      if (!newWeather.getId().equals(oldWeather.getId())) {
+        announceWeatherChange(newWeather);
+        applyMutationsToAllPlants(newWeather);
+      }
     }
+  }
 
-    @Override
-    public void run() {
-        if (weatherService.shouldChangeWeather(worldState)) {
-            WeatherData oldWeather = worldState.getCurrentWeather();
-            weatherService.changeWeather(worldState);
-            WeatherData newWeather = worldState.getCurrentWeather();
+  private void announceWeatherChange(WeatherData weather) {
+    String message = "§6Погода изменилась: " + weather.getName();
 
-            if (!newWeather.getId().equals(oldWeather.getId())) {
-                announceWeatherChange(newWeather);
-                applyMutationsToAllPlants(newWeather);
-            }
-        }
+    for (Player player : Bukkit.getOnlinePlayers()) {
+      AlertService.sendInfo(player, message);
     }
+  }
 
-    private void announceWeatherChange(WeatherData weather) {
-        String message = "§6Погода изменилась: " + weather.getName();
+  private void applyMutationsToAllPlants(WeatherData weather) {
+    for (Player player : Bukkit.getOnlinePlayers()) {
+      GamePlayer gamePlayer = player.getBungeePlayer();
+      if (gamePlayer == null) continue;
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            AlertService.sendInfo(player, message);
-        }
+      Map<String, CellData> cells = gamePlayer.getGarden().getAllPlantedCells();
+      for (CellData cell : cells.values()) {
+        SeedInstance instance = cell.getSeedInstance();
+        MutationService.applyWeatherMutations(instance, weather);
+      }
     }
+  }
 
-    private void applyMutationsToAllPlants(WeatherData weather) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            GamePlayer gamePlayer = player.getBungeePlayer();
-            if (gamePlayer == null) continue;
+  public static void start(GrowAGardenPlugin plugin, WeatherService weatherService, WorldState worldState) {
+    if (instance != null && !instance.isCancelled()) return;
 
-            Map<String, CellData> cells = gamePlayer.getGarden().getAllPlantedCells();
-            for (CellData cell : cells.values()) {
-                SeedInstance instance = cell.getSeedInstance();
-                if (instance != null) {
-                    MutationService.applyWeatherMutations(instance, weather);
-                }
-            }
-        }
+    instance = new WeatherTicker(weatherService, worldState);
+    instance.runTaskTimer(plugin, WEATHER_CHECK_INTERVAL, WEATHER_CHECK_INTERVAL);
+  }
+
+  public static void stop() {
+    if (instance != null) {
+      instance.cancel();
+      instance = null;
     }
-
-    public static void start(GrowAGardenPlugin plugin, WeatherService weatherService, WorldState worldState) {
-        if (instance != null && !instance.isCancelled()) {
-            return;
-        }
-        instance = new WeatherTicker(weatherService, worldState);
-        instance.runTaskTimer(plugin, WEATHER_CHECK_INTERVAL, WEATHER_CHECK_INTERVAL);
-    }
-
-    public static void stop() {
-        if (instance != null) {
-            instance.cancel();
-            instance = null;
-        }
-    }
+  }
 }

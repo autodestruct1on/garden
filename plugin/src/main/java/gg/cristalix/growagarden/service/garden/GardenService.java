@@ -1,23 +1,23 @@
 package gg.cristalix.growagarden.service.garden;
 
 import gg.cristalix.growagarden.GrowAGardenPlugin;
+import gg.cristalix.growagarden.common.util.RandomUtil;
 import gg.cristalix.growagarden.factory.ItemFactory;
 import gg.cristalix.growagarden.model.garden.CellData;
+import gg.cristalix.growagarden.model.garden.GardenData;
 import gg.cristalix.growagarden.model.garden.vegetation.MutationType;
 import gg.cristalix.growagarden.model.garden.vegetation.SeedData;
 import gg.cristalix.growagarden.model.garden.vegetation.SeedInstance;
 import gg.cristalix.growagarden.model.item.CropCustomItem;
 import gg.cristalix.growagarden.model.player.GamePlayer;
 import gg.cristalix.growagarden.model.world.WorldState;
-import gg.cristalix.growagarden.service.seed.SeedService;
+import gg.cristalix.growagarden.service.item.seed.SeedService;
+import gg.cristalix.wada.math.V3;
 import lombok.experimental.UtilityClass;
-import ru.cristalix.core.math.V3;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
+import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class GardenService {
@@ -28,61 +28,50 @@ public class GardenService {
     return !player.getGarden().hasPlantInRadius(position, MIN_PLANT_DISTANCE);
   }
 
-  public boolean plantSeed(GamePlayer player, V3 position, UUID seedUuid) {
-    if (!canPlantAt(player, position)) {
-      return false;
-    }
+  public boolean plantSeed(GamePlayer player, V3 position, String seedId) {
+    if (!canPlantAt(player, position)) return false;
 
     SeedService seedService = GrowAGardenPlugin.getInstance().getSeedService();
-    SeedData seedData = seedService.getSeedDataByUUID(seedUuid);
+    SeedData seedData = seedService.getSeedDataByName(seedId);
 
-    if (seedData == null) {
-      return false;
-    }
+    if (seedData == null) return false;
 
-    long now = System.currentTimeMillis();
-    SeedInstance instance = new SeedInstance();
-    instance.setSeedUuid(seedData.getUuid());
-    instance.setPlantedAtMillis(now);
-    instance.setWatered(false);
-    instance.setFinalWeightCalculated(false);
+    SeedInstance instance = new SeedInstance(seedData);
 
-    CellData cellData = new CellData(position);
-    cellData.setSeedInstance(instance);
+    CellData cellData = new CellData(position, instance);
     player.getGarden().addPlantedCell(position, cellData);
 
+    //CropMod.loadCrops(player, cellData);
     return true;
   }
 
   @Nullable
   public CropCustomItem harvestCrop(GamePlayer player, V3 position, WorldState worldState) {
     CellData cell = player.getGarden().getCellAtPosition(position);
-    if (cell == null || cell.getSeedInstance() == null) {
-      return null;
-    }
+    if (cell == null) return null;
 
     SeedInstance instance = cell.getSeedInstance();
     SeedService seedService = GrowAGardenPlugin.getInstance().getSeedService();
-    SeedData seedData = seedService.getSeedDataByUUID(instance.getSeedUuid());
+    SeedData seedData = seedService.getSeedDataByName(instance.getSeedId());
 
-    if (seedData == null || !instance.isFullyGrown(seedData, worldState)) {
-      return null;
-    }
+    if (seedData == null || !instance.isFullyGrown(seedData, worldState)) return null;
 
     MutationService.applyHarvestMutations(instance, worldState.getCurrentWeather());
 
     double weight = calculateWeightKg(seedData);
-    Set<MutationType> mutations = new HashSet<>(instance.getMutations());
+    Set<MutationType> mutations = instance.getMutations();
 
     CropCustomItem crop = ItemFactory.createCrop(seedData.getId(), weight, mutations);
 
     if (seedData.isMultiHarvest()) {
-      instance.setPlantedAtMillis(System.currentTimeMillis());
+      instance.setPlantedAtMillis(Instant.now().toEpochMilli());
       instance.setWatered(false);
       instance.setFinalWeightCalculated(false);
-      instance.getMutations().clear();
+      instance.clearMutation();
+      //CropMod.update(player, instance);
     } else {
       player.getGarden().removeCellAtPosition(position);
+      //CropMod.removeCrops(player, instance.getSeedId());
     }
 
     return crop;
@@ -90,26 +79,23 @@ public class GardenService {
 
   public boolean waterPlant(GamePlayer player, V3 position) {
     CellData cell = player.getGarden().getCellAtPosition(position);
-    if (cell == null || cell.getSeedInstance() == null) {
-      return false;
-    }
+    if (cell == null) return false;
 
     SeedInstance instance = cell.getSeedInstance();
-    if (instance.isWatered()) {
-      return false;
-    }
+    if (instance.isWatered()) return false;
 
     instance.water();
+    //CropMod.update(player, instance);
     return true;
   }
 
   public boolean digPlant(GamePlayer player, V3 position) {
-    CellData cell = player.getGarden().getCellAtPosition(position);
-    if (cell == null || cell.getSeedInstance() == null) {
-      return false;
-    }
+    GardenData garden = player.getGarden();
+    CellData cell = garden.getCellAtPosition(position);
+    if (cell == null) return false;
 
-    player.getGarden().removeCellAtPosition(position);
+    garden.removeCellAtPosition(position);
+    //CropMod.removeCrops(player, Collections.singleton(instance.getSeedId()));
     return true;
   }
 
@@ -123,24 +109,18 @@ public class GardenService {
   }
 
   public double getGrowthProgress(CellData cell, WorldState worldState) {
-    if (cell == null || cell.getSeedInstance() == null) {
-      return 0.0;
-    }
+    if (cell == null || cell.getSeedInstance() == null) return 0.0;
 
     SeedInstance instance = cell.getSeedInstance();
     SeedService seedService = GrowAGardenPlugin.getInstance().getSeedService();
-    SeedData seedData = seedService.getSeedDataByUUID(instance.getSeedUuid());
+    SeedData seedData = seedService.getSeedDataByName(instance.getSeedId());
 
-    if (seedData == null) {
-      return 0.0;
-    }
+    if (seedData == null) return 0.0;
 
     return instance.getGrowthProgress(seedData, worldState);
   }
 
   private double calculateWeightKg(SeedData seed) {
-    double min = Math.max(0.0, seed.getBaseWeightKgMin());
-    double max = Math.max(min, seed.getBaseWeightKgMax());
-    return ThreadLocalRandom.current().nextDouble(min, max);
+    return RandomUtil.getRandomDouble(seed.getBaseWeightKgMin(), seed.getBaseWeightKgMax());
   }
 }
