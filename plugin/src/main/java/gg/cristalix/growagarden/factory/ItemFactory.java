@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.factory;
 
 import gg.cristalix.growagarden.common.mod.inventory.ItemEnum;
@@ -28,4 +29,4 @@ public class ItemFactory {
     crop.addInstance(weight, mutations);
     return crop;
   }
-}
+}*/

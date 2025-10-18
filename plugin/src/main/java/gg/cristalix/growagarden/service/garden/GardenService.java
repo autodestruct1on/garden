@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.service.garden;
 
 import gg.cristalix.growagarden.GrowAGardenPlugin;
@@ -123,4 +124,4 @@ public class GardenService {
   private double calculateWeightKg(SeedData seed) {
     return RandomUtil.getRandomDouble(seed.getBaseWeightKgMin(), seed.getBaseWeightKgMax());
   }
-}
+}*/

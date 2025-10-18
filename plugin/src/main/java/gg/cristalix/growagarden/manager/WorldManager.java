@@ -1,23 +1,25 @@
-/*
-package gg.cristalix.growagarden.service.world;
+package gg.cristalix.growagarden.manager;
 
 import gg.cristalix.growagarden.model.garden.vegetation.MutationType;
 import gg.cristalix.growagarden.model.world.WorldState;
 import gg.cristalix.growagarden.model.world.weather.WeatherData;
 import gg.cristalix.growagarden.model.world.weather.WeatherType;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class WeatherService {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class WorldManager {
 
-    List<WeatherData> weatherPool;
+    @Getter
+    final List<WeatherData> weatherPool;
 
-    public WeatherService() {
+
+
+    public WorldManager() {
         this.weatherPool = new ArrayList<>();
         initializeWeatherPool();
     }
@@ -91,6 +93,7 @@ public class WeatherService {
         weather.addMutation(MutationType.WET, 0.1);
         return weather;
     }
+
 
     private WeatherData createBloodMoonWeather() {
         WeatherData weather = new WeatherData();
@@ -225,4 +228,4 @@ public class WeatherService {
         long elapsed = now - worldState.getWeatherStartedAt();
         return elapsed >= currentWeather.getDurationMillis();
     }
-}*/
+}

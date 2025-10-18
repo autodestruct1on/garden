@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.service.garden;
 
 import gg.cristalix.growagarden.model.garden.vegetation.MutationType;
@@ -79,4 +80,4 @@ public class MutationService {
     private boolean isRareMutation(MutationType mutation) {
         return mutation == MutationType.AURORA || mutation == MutationType.SUNDRIED;
     }
-}
+}*/

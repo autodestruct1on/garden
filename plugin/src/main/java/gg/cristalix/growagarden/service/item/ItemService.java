@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.service.item;
 
 import gg.cristalix.growagarden.model.item.*;
@@ -64,4 +65,4 @@ public class ItemService {
   public CustomItemData getItemData(String itemId) {
     return customItemDataMap.get(itemId);
   }
-}
+}*/

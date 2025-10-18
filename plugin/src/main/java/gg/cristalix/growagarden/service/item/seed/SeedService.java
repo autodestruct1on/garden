@@ -1,3 +1,4 @@
+/*
 package gg.cristalix.growagarden.service.item.seed;
 
 import gg.cristalix.growagarden.model.garden.vegetation.SeedData;
@@ -33,4 +34,4 @@ public class SeedService {
     double withMultiplier = basePrice * seed.getCategory().getPriceMultiplier();
     return Math.max(seed.getCategory().getMinPrice(), withMultiplier);
   }
-}
+}*/
